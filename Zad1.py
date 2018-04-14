@@ -1,160 +1,167 @@
 import string
+from collections import OrderedDict
+import numpy
 
-
-def property_of_sentence(sentence):
-    correct_operators = ['&','|','~','>',"=","/"] # wlasne zasady dla ~ ,  = , chyba dla >     / - xor
-    correct_variables = list(string.ascii_lowercase)
-
-    recent_position = 1
-    what_recent_was = 3   # 0 - variable, 1 - bracket left, 2 - bracket right, 3 - operator
-    czy_cos_jest_w_nawiasach = True
+def propriety_of_sentence(sentence):
+    #& -> and, | -> or, ~ -> not, > -> implikacja, = -> rownowaznosc, ^ -> XOR
+    correct_operators = ['&', '|', '~', '>', "=", "^"]
+    correct_variables = list(string.ascii_lowercase) + list(map(str, [0,1,2,3,4,5,6,7,8,9]))
     brackets = 0
-    space_after_variable = False
-
+    was_char = 0
+    was_space = 0
+    #sprawdzenie czy mozna usunac spacje
     for i in sentence:
-        if(i == "~"):
-            if(what_recent_was == 1):
-                recent_position+=1
-                what_recent_was = 3
-            elif(recent_position == 1):
-                what_recent_was = 3
-                recent_position+=1
-            else:
-                print("zle ~")
+        if( i in correct_variables):
+            if(was_char == 1 and was_space == 1):
+                print("Blad")
                 return False
-        elif(i == "="):
-            if(what_recent_was != 3 and brackets == 0):
-                recent_position+=1
-                what_recent_was = 3
-            else:
-                print("zle =")
+            was_char = 1
+            was_space = 0
+        elif i == " ":
+            was_space = 1
+        else:
+            was_space = 0
+            was_char = 0
+
+    sentence = sentence.replace(" ","")
+    last_char = -1  # 0 - variable, 1 - operator, 2 - left bracket, 3 -right bracket
+    amount_of_equivalence = 0
+    for i in sentence:
+        if(i == "("):
+            if(last_char == 0 or last_char == 3):
+                print("zle nawiasy")
                 return False
-        elif(i == "(" and what_recent_was != 0): #1
-            czy_cos_jest_w_nawiasach = False
-            recent_position+=1
-            what_recent_was = 1
             brackets+=1
-        elif(i == ")" and what_recent_was != 3 and czy_cos_jest_w_nawiasach is True): #2
-            recent_position+=1
-            what_recent_was = 2
+            last_char = 2
+
+        elif(i == ")"):
+            if(last_char == 1 or last_char == 2):
+                print("zle nawiasy")
+                return False
             brackets-=1
-        elif(i in correct_variables): #3
-            czy_cos_jest_w_nawiasach = True
-            if(what_recent_was == 0):
-                if( space_after_variable is False):
-                    recent_position+=1
-                else:
-                    print("zle 3")
-                    return False
-            elif(what_recent_was != 2):
-                recent_position += 1
-                what_recent_was = 0
-            else:
-                print("zle 3.5 ")
+            last_char = 3
+        elif(i == "="):
+            if(amount_of_equivalence == 1 or brackets != 0 or last_char == 1):
+                print("zla rownosc")
                 return False
-        elif(i in correct_operators and i != "~"): #4
-            if(what_recent_was == 1 or what_recent_was == 3):
-                print("zle 4")
+            amount_of_equivalence=1
+            last_char = 1
+        elif(i in correct_variables):
+            if(last_char == 3):
+                print("zmienna w zlym miejscu")
                 return False
-            else:
-                what_recent_was = 3
-                recent_position+=1
-        elif(i == " "):
-            if(what_recent_was == 0):
-                space_after_variable = True
-            recent_position+=1
-        else: #5
-            print("zle 5")
-            return False
+            last_char = 0
+            pass
+        elif(i == "~"):
+            if(last_char == 0 or last_char == 1):
+                print("zle zaprzeczenie")
+                return False
+            last_char = 1
+        elif(i in correct_operators):
+            if(last_char == 1):
+                print("dwa operatory obok siebie")
+                return False
+            last_char = 1
         if(brackets<0):
-            print("zle")
+            print("zle nawiasy")
             return False
-    if (brackets != 0):
-        print("zle 6")
+
+    if brackets != 0:
+        print("zle nawiasy")
         return False
-    for i in range(-1,-len(sentence),-1):
-        if(sentence[i] in correct_variables):
-            break
-        elif(sentence[i] in correct_operators):
-            print("Zly koniec")
-            return False
-    print("DOBRZE")
+    if last_char == 1:
+        print("na koncu jest operator")
+        return False
     return True
 
 
-def pow(a,b):
+def pow(a, b):
     result = 1
     for i in range(0,b):
-        result*=a
+        result *= a
     return result
 
 
 def dec_to_bin(number):
     result = 0
     i = 0
-    while(number):
-        result += pow(10,i)*(number%2)
+    while number:
+        result += pow(10, i)*(number % 2)
         number //= 2
         i+=1
     return result
 
 
 def changing_to_onp(sentence):
-    operators = {'&': 1, '|': 1, '~': 0, '>': 0, "=": 3, "/": 1} # ~ traktowac jakosc inaczej ? moze jako czesc zmiennej?
-    correct_variables = list(string.ascii_lowercase)
+    operators = {'&': 1, '|': 1, '>': 0, "=": 0, "^": 1, "(": 0, ")":0, "~": 1}
+    correct_variables = list(string.ascii_lowercase) + list(map(str, [0,1,2,3,4,5,6,7,8,9]))
+    print(correct_variables)
     out = []
     stack = []
 
-    space_after_variable = False
     variable = ""
-
     for i in sentence:
-        print("out ",out)
-        print("stack ",stack)
-        print("i = ",i,"\n\n")
-        print
         if(i in correct_variables):
             variable+=i
+        elif (i == "("):
+            stack.append(i)
+        elif (i == ")"):
+            if (variable != ""):
+                out.append(variable)
+                variable = ""
+            while (True):
+                top = stack.pop()
+                if (top == "("):
+                    break
+                out.append(top)
         elif(i in operators.keys()):
-            if(variable != ""):
+            if (variable != ""):
                 out.append(variable)
                 variable = ""
             if(len(stack) == 0):
                 stack.append(i)
             else:
                 top = stack.pop()
-                if(top in operators.keys() and operators[top] < operators[i] and top == ">"):
-                    out.append(top)
-                    stack.append(i)
-                elif(top in operators.keys() and operators[top] <= operators[i] and top != ">"):
-                    out.append(top)
-                    stack.append(i)
+                if (i != ">"):
+                    while (True):
+                        if (top in operators and operators[i] <= operators[top]):
+                            out.append(top)
+                            if (len(stack)):
+                                top = stack.pop()
+                            else:
+                                stack.append(i)
+                                break
+
+                        else:
+                            stack.append(top)
+                            stack.append(i)
+                            break
                 else:
-                    stack.append(top)
-                    stack.append(i)
+                    while (True):
+                        if (top in operators and operators[i] < operators[top]):
+                            out.append(top)
+                            if (len(stack)):
+                                top = stack.pop()
+                            else:
+                                stack.append(i)
+                                break
 
-        elif(i == "("):
-            stack.append(i)
-        elif(i == ")"):
-            while(True):
-                top = stack.pop()
-                if(top == "("):
-                    break
-                out.append(top)
-
+                        else:
+                            stack.append(top)
+                            stack.append(i)
+                            break
     if(variable != ""):
         out.append(variable)
-        variable = ""
     while(len(stack)):
         out.append(stack.pop())
-    print(out)
-    #for i in sentence:
+    print("ONP is ",out)
+    return out
 
-
-def program(sentence):
+#nie potrzebne?
+def find_variables(sentence):
     all_variables = []
     variable = ""
-    correct_variables = list(string.ascii_lowercase)
+    correct_variables = list(string.ascii_lowercase) + list(map(str, [0,1,2,3,4,5,6,7,8,9]))
     for i in sentence:
         if(i in correct_variables):
             variable+=i
@@ -171,21 +178,271 @@ def program(sentence):
     print(all_variables)
 
 
-def shorting_sentence(sentence):
-    correct_operators = ['&', '|', '^', '~', '>', "="]  # wlasne zasady dla ~ ,  = , chyba dla >
-    correct_variables = list(string.ascii_lowercase)
-    all_variables = []
+#check onp for chosen variables if it is true or false
+def calculate_onp_with_chosen_variables(sentence,variables):
+    stack = []
+    for i in sentence:
+        if( i == "&"):
+            Top = stack.pop()
+            Lower = stack.pop()
+            stack.append(Top and Lower)
+        elif(i == "|"):
+            Top = stack.pop()
+            Lower = stack.pop()
+            stack.append(Top or Lower)
+        elif(i == "^"):
+            Top = stack.pop()
+            Lower = stack.pop()
+            stack.append(bool(Top) ^ bool(Lower))
+        elif(i == "~"):
+            Top = stack.pop()
+            stack.append(not Top)
+        elif(i == ">"):
+            Top = stack.pop()
+            Lower = stack.pop()
+            stack.append((not Lower) or Top)
+        elif(i == "="):
+            Top = stack.pop()
+            Lower = stack.pop()
+            stack.append(Lower == Top)
+        else:
+            stack.append(variables[i])
+
+    return stack.pop()
+
+
+#ostatni krok algorytmu w ktorym wybiera sie koncowy wynik przy pomocy tablicy
+def sec_part_of_Qalgorithm(almost_done, arguments, sigma):
+    tmp = set()
+    for i in almost_done:
+        if almost_done[i] in tmp:
+            continue
+        tmp.add(almost_done[i])
+    list_of_almost_done = []
+    for i in tmp:
+        for j in almost_done:
+            if(i == almost_done[j]):
+                list_of_almost_done.append(j)
+                break
+    table = numpy.zeros((len(list_of_almost_done), len(sigma)))
+    for index_i,i in enumerate(list_of_almost_done):
+        tmp = i.split(",")
+        for j in sigma:
+            for index_k,k in enumerate(tmp):
+                if(str(j) == k):
+                    table[index_i][sigma.index(j)] = 1
+    # print(table)
+    last_last_last_out = set()
+    for i in range(len(sigma)):
+        amount_of_ones = 0
+        for j in range(len(list_of_almost_done)):
+            if( table[j][i] == 1):
+                amount_of_ones += 1
+        if(amount_of_ones == 1):
+            for j in range(len(list_of_almost_done)):
+                if(table[j][i] == 1):
+                    last_last_last_out.add(list_of_almost_done[j])
+
+    print(last_last_last_out)
+    last_last_last_last_out = set()
+    for i in last_last_last_out:
+        last_last_last_last_out.add(almost_done[i])
+    print(last_last_last_last_out)
+    print(list(arguments.keys()))
+    print(arguments)
+    #budowanie ostatecznego wyniku
+    out = ""
+    for index,i in enumerate(last_last_last_last_out):
+        for j in range(len(i)):
+            if(i[j] == "1"):
+                if(j < len(i) and out != "" and out[len(out)-1] != "|"):
+                    out+="&"
+                out += list(arguments.keys())[j]
+            elif(i[j] == "0"):
+                if (j < len(i) and out != "" and out[len(out)-1] != "|"):
+                    out += "&"
+                out+="(~"+list(arguments.keys())[j]+")"
+        if(index < len(last_last_last_last_out)-1):
+            out += "|"
+    print("out ",out)
+
+
+def calculate_sigma(onp): #wylicza sigme
+    correct_variables = list(string.ascii_lowercase) + list(map(str, [0,1,2,3,4,5,6,7,8,9]))
+    arguments = OrderedDict()
+    # arguments = []
+    sigma = []
+    for i in onp:
+        if(i[0] not in correct_variables):
+            pass
+        else:
+            # arguments.append(i)
+            arguments[i] = True
+            arguments.move_to_end(i, last=False)
+    print(arguments)
+    # arguments = set(arguments)
+    # arguments = dict.fromkeys(arguments,True)
+    max_number = pow(2,len(arguments))
+    for i in range(max_number):
+        tmp = i
+        for j,value in list(arguments.items())[::-1]:
+            print(j)
+            if(tmp%2):
+                arguments[j]=True # moze wkladac True/False?
+            else:
+                arguments[j]=False
+            tmp = int(tmp/2)
+        if(calculate_onp_with_chosen_variables(onp,arguments)):
+            sigma.append(i)
+    if(len(sigma) == 0):
+        print("Always false.")
+        # return False
+        exit(0)
+    elif(len(sigma) == max_number):
+        print("Always true.")
+        # return False
+        exit(0)
+    return [sigma,arguments]
+    # outer = Qalgorytm(sigma,arguments)
+    # print("ala",outer)
+    # making_last_step(outer,arguments,sigma)
+
+
+def dec_to_bin_string(number,size):
+    out = ""
+    while number:
+        out += str(number % 2)
+        number = int(number/2)
+
+    while size-len(out):
+        out += "0"
+    out = out[::-1]
+    return out
+
+
+def number_of_ones(number):
+    out = 0
+    for i in number:
+        if i == "1":
+            out += 1
+    return out
+
+
+def if_diffrence_in_one_char(number1,number2):
+    i = len(number1)-1
+    amount_of_differs = 0
+    while(i>-1):
+        if(number1[i] != number2[i]):
+            if not (amount_of_differs):
+                amount_of_differs = 1
+            else:
+                return False
+        i-=1
+    if(amount_of_differs == 0):
+        return False
+    return True
+
+
+#connect two variables e.g 11x0 10x0 => 1xx0
+def connection(number1,number2):
+    out = ""
+    i = len(number1) - 1
+    while(i>-1):
+        if(number1[i] != number2[i]):
+            out += "x"
+        else:
+            out += number1[i]
+        i-=1
+    return out[::-1]
+
+
+#compare two variable e.g (0,1) (2,3)
+def comparator(variable1,variable2):
+    variable1 = variable1.split(",")
+    variable2 = variable2.split(",")
+    length = max(len(variable1),len(variable2))
+    for i in range(0,length):
+        if(int(variable1[i] )< int(variable2[i])):
+            return -1
+        elif(int(variable1[i]) > int(variable2[i])):
+            return 1
+    return 0
+
+
+def qs(list):
+    lesser = []
+    greater = []
+    equal = []
+    if(len(list)>1):
+        pivot = list[0]
+        for i in list:
+            if(comparator(i,pivot)==-1):
+                lesser.append(i)
+            elif(comparator(i,pivot)==1):
+                greater.append(i)
+            else:
+                equal.append(i)
+        return qs(lesser) + equal + qs(greater)
+    else:
+        return list
+
+
+def sort_keys(out):
+    keys = list(out.keys())
+    print(keys)
+    sorted_keys = qs(keys)
+    return sorted_keys
+
+def Qalgorithm(sigma,arguments):
+    print("sigma = ",sigma)
+    # print(len(arguments))
+    # print(arguments)
+    tmp = OrderedDict()
+    for i in sigma:
+        tmp[str(i)]=dec_to_bin_string(i,len(arguments))
+    print(tmp)
+    new_list = tmp
+    print(list(new_list.keys()))
+    # k = 4
+    LastOut = OrderedDict() # koncowy wynik
+    while(True):
+        keys = []
+        used_keys = set()
+        for i in new_list.keys():
+            keys.append(i)
+        out = OrderedDict()
+        for index,i in enumerate(keys):
+            for j in keys[index+1:]:
+                print(i," ",new_list[i]," ",j," ",new_list[j])
+                if (if_diffrence_in_one_char(new_list[i], new_list[j])):
+                    used_keys.add(i)
+                    used_keys.add(j)
+                    connection1 = connection(new_list[i], new_list[j])
+                    for m in out:
+                        if(out[m] == connection1):
+                            continue
+                    out[i + "," + j] = connection(new_list[i], new_list[j])
+        not_used_keys = set(new_list.keys()).difference(used_keys)
+        for i in not_used_keys:
+            LastOut[i] = new_list[i]
+        sorted_keys = sort_keys(out)
+        tmp = OrderedDict()
+        for i in sorted_keys:
+            tmp[i] = out[i]
+        if not(bool(out)):
+            for l in new_list.keys():
+                LastOut[l] = new_list[l]
+            return LastOut
+        new_list = tmp
 
 
 
 if __name__ == "__main__":
-    changing_to_onp("c>a>b&c&d")
-    #print(False and False or True)
-    #print(dec_to_bin(15))
+    sentence = "a>&() "
+    if propriety_of_sentence(sentence):
+        ONP = changing_to_onp(sentence)
+        sigma_and_arguments = calculate_sigma(ONP)
+        # print(sigma_and_arguments)
+        after_first_part_Qalgorithm = Qalgorithm(sigma_and_arguments[0],sigma_and_arguments[1])
+        out = sec_part_of_Qalgorithm(after_first_part_Qalgorithm, sigma_and_arguments[1], sigma_and_arguments[0])
 
-    """
-    if_proper = property_of_sentence("a&(bc|c)&b")
-    if(if_proper is False):
-        print("Sentense isn't proper.")
-        exit(1)
-    """
