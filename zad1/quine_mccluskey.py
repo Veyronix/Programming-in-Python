@@ -81,83 +81,84 @@ def sort_keys(out):
 
 #redukowanie wartosci do najmniejszej ilosci
 def first_part_of_algorithm(sigma, len_of_arguments):
-    #print("sigma = ", sigma)
     tmp = OrderedDict()
     for i in sigma:
         tmp[str(i)] = dec_to_bin_string(i, len_of_arguments)
-    new_list = tmp
-    print(new_list)
+    sigma_with_bin_version = tmp
     lastOut = OrderedDict()  # koncowy wynik
     while (True):
         keys = []
         used_keys = set()
-        for i in new_list.keys():
+        for i in sigma_with_bin_version.keys():
             keys.append(i)
         out = OrderedDict()
+        # porownywanie wartosci z kazda inna 'wieksza' wartoscia
         for index, i in enumerate(keys):
             for j in keys[index + 1:]:
-                # print(i," ",new_list[i]," ",j," ",new_list[j])
-                if (if_diffrence_in_one_char(new_list[i], new_list[j])):
+                if (if_diffrence_in_one_char(sigma_with_bin_version[i], sigma_with_bin_version[j])):
                     used_keys.add(i)
                     used_keys.add(j)
-                    connection1 = connection(new_list[i], new_list[j])
+                    new_connection= connection(sigma_with_bin_version[i], sigma_with_bin_version[j])
                     for m in out:
-                        if (out[m] == connection1):
+                        if (out[m] == new_connection):
                             continue
-                    out[i + "," + j] = connection(new_list[i], new_list[j])
-        not_used_keys = set(new_list.keys()).difference(used_keys)
+                    out[i + "," + j] = connection(sigma_with_bin_version[i], sigma_with_bin_version[j])
+        not_used_keys = set(sigma_with_bin_version.keys()).difference(used_keys)
+        # dodawanie nieuzytych wartosci do wynikowej mapy
         for i in not_used_keys:
-            lastOut[i] = new_list[i]
+            lastOut[i] = sigma_with_bin_version[i]
         sorted_keys = sort_keys(out)
+        # sortowanie nowych wartosci i wartosci ktore uzylismy w laczeniu ostatnio
         tmp = OrderedDict()
         for i in sorted_keys:
             tmp[i] = out[i]
         if not (bool(out)): #jesli nie bylo zadnych zmian
-            for l in new_list.keys():
-                lastOut[l] = new_list[l]
+            for l in sigma_with_bin_version.keys():
+                lastOut[l] = sigma_with_bin_version[l]
             return lastOut
-        new_list = tmp
+        sigma_with_bin_version = tmp
 
 # ostatni krok algorytmu w ktorym wybiera sie koncowy wynik przy pomocy tablicy
-def sec_part_of_algorithm(almost_done, arguments, sigma):
+def sec_part_of_algorithm(connected_values_of_sigma, arguments, sigma):
     # otrzymanie pojedynczych wartosci np 1x10
-    tmp = set()
-    for i in almost_done:
-        if almost_done[i] in tmp:
+    singular_values = set()
+    for i in connected_values_of_sigma:
+        if connected_values_of_sigma[i] in singular_values:
             continue
-        tmp.add(almost_done[i])
-    list_of_almost_done = []
-    # otrzymanie wartosci z sigmy np xx0 -> 0,4,2,6
-    for i in tmp:
-        for j in almost_done:
-            if (i == almost_done[j]):
-                list_of_almost_done.append(j)
+        singular_values.add(connected_values_of_sigma[i])
+    code_of_values = []
+    # otrzymanie wartosci np xx0 -> 0,4,2,6
+    for i in singular_values:
+        for j in connected_values_of_sigma:
+            if (i == connected_values_of_sigma[j]):
+                code_of_values.append(j)
                 break
     # tworzenie tablicy w celu uproszczenia wyrazenia
-    table = zeros((len(list_of_almost_done), len(sigma)))
-    for index_i, i in enumerate(list_of_almost_done):
-        tmp = i.split(",")
+    table = zeros((len(code_of_values), len(sigma)))
+    for index_i, i in enumerate(code_of_values):
+        # connected_values np 1,3 -> ['1','3']
+        singular_values = i.split(",")
         for j in sigma:
-            for index_k, k in enumerate(tmp):
+            for k in singular_values:
                 if (str(j) == k):
                     table[index_i][sigma.index(j)] = 1
     # wybieranie koniecznych wyrazow przy pomocy tablicy np 0,4,1,5
     from_table = set()
     for i in range(len(sigma)):
         amount_of_ones = 0
-        for j in range(len(list_of_almost_done)):
+        for j in range(len(code_of_values)):
             if (table[j][i] == 1):
                 amount_of_ones += 1
         if (amount_of_ones == 1):
             # sprawdzanie dla ktorego wyraznia np 1x01 jest w kolumnie jeden X
-            for j in range(len(list_of_almost_done)):
+            for j in range(len(code_of_values)):
                 if (table[j][i] == 1):
-                    from_table.add(list_of_almost_done[j])
+                    from_table.add(code_of_values[j])
 
     # znalezenie odpowiadajacej wartosci np 0,4,1,5 -> 0x0
     last_values = set()
     for i in from_table:
-        last_values.add(almost_done[i])
+        last_values.add(connected_values_of_sigma[i])
     # budowanie ostatecznego wyniku, wynik jest w roznej kolejnosci bo set nie ma kolejnosci
     out = []
     for index, i in enumerate(last_values):

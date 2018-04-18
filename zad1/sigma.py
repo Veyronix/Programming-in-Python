@@ -10,7 +10,6 @@ def calculate_sigma(onp):  # wylicza sigme
         if (i[0] not in correct_variables):
             pass
         else:
-
             arguments[i] = True
             arguments.move_to_end(i, last=False)
 
@@ -18,12 +17,11 @@ def calculate_sigma(onp):  # wylicza sigme
     for i in range(max_number):
         tmp = i
         for j, value in list(arguments.items())[::-1]:
-            #pierwsze dwa warunki sa po to ze uznajemy 1 za True, a 0 za False
-            # if(j == "1"):
-            #     arguments[j] = True
-            # elif(j == "0"):
-            #     arguments[j] = False
-            if (tmp % 2):
+            if 'true' in j:
+                arguments[j] = True
+            elif 'false' in j:
+                arguments[j] = False
+            elif (tmp % 2):
                 arguments[j] = True
             else:
                 arguments[j] = False

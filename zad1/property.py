@@ -5,7 +5,7 @@ def propriety_of_expression(expression):
     # & -> and, | -> or, ~ -> not, > -> implikacja, = -> rownowaznosc, ^ -> XOR
     correct_operators = ['&', '|', '~', '>', "=", "^"]
     correct_variables = list(ascii_lowercase) + list(map(str, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
-    if expression is [] or expression[0] in correct_operators:
+    if expression is [] or (expression[0] in correct_operators and expression[0] != '~'):
         return False
     brackets = 0
     was_char = 0
@@ -30,7 +30,6 @@ def propriety_of_expression(expression):
     # ostateczne sprawdzenie poprawnosci
     expression = expression.replace(" ", "")
     last_char = -1  # 0 - variable, 1 - operator, 2 - left bracket, 3 -right bracket
-    amount_of_equivalence = 0
     for i in expression:
         if (i == "("):
             if (last_char == 0 or last_char == 3):
@@ -38,19 +37,12 @@ def propriety_of_expression(expression):
                 return False
             brackets += 1
             last_char = 2
-
         elif (i == ")"):
             if (last_char == 1 or last_char == 2):
                 print("zle nawiasy")
                 return False
             brackets -= 1
             last_char = 3
-        elif (i == "="):
-            if (amount_of_equivalence == 1 or brackets != 0 or last_char == 1):
-                print("zla rownosc")
-                return False
-            amount_of_equivalence = 1
-            last_char = 1
         elif (i in correct_variables):
             if (last_char == 3):
                 print("zmienna w zlym miejscu")
@@ -70,7 +62,6 @@ def propriety_of_expression(expression):
         if (brackets < 0):
             print("zle nawiasy")
             return False
-
     if brackets != 0:
         print("zle nawiasy")
         return False

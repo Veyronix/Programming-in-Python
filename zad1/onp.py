@@ -62,5 +62,19 @@ def changing_to_onp(expression):
         out.append(("").join(variable))
     while (len(stack)):
         out.append(stack.pop())
+    for i in out:
+        if 'true' in i or 'false' in i:
+            print("Zmien nazwe zmiennej na normalna :)")
+            exit(1)
+    num_of_1 = 0
+    num_of_0 = 0
+    for index,i in enumerate(out):
+        if i == '1':
+            out[index] = 'true' + str(num_of_1)
+            num_of_1+=1
+        elif i == '0':
+            out[index] = 'false' + str(num_of_0)
+            num_of_0 += 1
+
     print("ONP is ", out)
     return out
