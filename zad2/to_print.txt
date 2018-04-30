@@ -1,0 +1,11 @@
+{
+    "Figures": [
+        {"type": "point", "x": 700, "y": 700, "color": "#abcdef"},
+        {"type": "polygon", "points": [[20,50], [30,140], [50,180]], "color": "blue"},
+        {"type": "rectangle", "x": 100, "y": 50, "width": 200, "height": 50, "color": "blue"},
+        {"type": "square", "x": 150, "y": 100, "size": 80, "color": "#000000"},
+        {"type": "circle", "x": 800, "y": 600, "radius": 40, "color": "#abcdef"}
+    ],
+    "Screen": {"width": 1000, "height": 1000, "bg_color": "black", "fg_color": "blue"},
+    "Palette": {"lol": "#0f00ff", "blue": "#f00ff0", "black": "#000000"}
+}
