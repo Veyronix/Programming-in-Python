@@ -1,25 +1,57 @@
-from termcolor import colored
-import json
+from json import loads
 import matplotlib.pyplot as plt
-from Draw import Draw
-import tkinter
-from Shape import Shape,Square
 from JSONParser import JSONParser
-import sys
-# from square import Square
+from sys import argv, exc_info
+from os.path import exists
 
 
-if __name__ == "__main__":
+def draw(json_parser, if_print):
+    palette = json_parser.get_palette()
+    screen = json_parser.get_screen()
+    shapes = json_parser.get_shapes()
+
+    fig = plt.figure(figsize=(screen["width"], screen["height"]), dpi=1)
+
+    fig.artists.append(plt.Rectangle((0, 0), screen["width"], screen["height"],
+                                     facecolor=JSONParser.return_color(palette, screen["bg_color"]), zorder=0))
+    for i in shapes:
+        i.add_shape(fig)
+
+    if if_print == 1:
+        fig.savefig(argv[3])
+        plt.close(fig)
+    else:
+        plt.show()
+
+
+def main():
     pass
-    file = open("to_print.txt","r")
+    print('Number of arguments:', len(argv), 'arguments.')
+    print('Argument List:', str(argv[1]))
+    if_to_print = 0
+
+    if not exists(str(argv[1])):
+        print("Given file doesnt exist.")
+        return 1
+    if len(argv) == 4 and argv[2] == "-o":
+        if_to_print = 1
+    elif len(argv) != 2:
+        print("Bad amount of arguments.")
+        return 1
+    file = open(str(argv[1]), "r")
     all_lines = ""
     for i in file:
         all_lines += i
+    print(all_lines)
     try:
-        json_my = JSONParser(json.loads(all_lines))
-        Draw.draw_to_screen(json_my)
+        json_my = JSONParser(loads(all_lines))
+
     except ValueError:
-        print("Bad JSON",sys.exc_info())
+        print("Bad JSON", exc_info())
         exit(1)
 
+    draw(json_my, if_to_print)
 
+
+if __name__ == "__main__":
+    main()
