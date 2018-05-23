@@ -79,7 +79,7 @@ class JSONParser:
                 if "x" not in i or "y" not in i or "width" not in i or "height" not in i:
                     return 1
             elif type == "square":
-                if "x" not in i or "y" not in i or (("size" not in i) == ("radius" not in i)):
+                if "x" not in i or "y" not in i or "size" not in i:
                     return 1
             elif type == "circle":
                 if "x" not in i or "y" not in i or "radius" not in i:
