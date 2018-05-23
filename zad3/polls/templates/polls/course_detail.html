@@ -1,0 +1,45 @@
+{% load staticfiles %}
+<html>
+    <head>
+        <title>Course Detail</title>
+    </head>
+    <body>
+            <div class="name-of-course">
+                    <h1>{{name.name}}</h1>
+            </div>
+        {% if list_of_people_registered %}
+            {% for enrollment in list_of_people_registered %}
+                <div class="content container">
+                    <div class = "row">
+                        <div class="col-md-8">
+                            {{ enrollment.person }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}    
+        {% else %}
+            <p>Brak zapisanych.</p>
+        {% endif %}
+        {% if amount_of_vacancies != 0 %}
+            <div class="places">
+                <h2>Amount of vacancies</h2>
+                {{ amount_of_vacancies }}
+            </div>
+        {% endif %}
+        <div class="register">
+            <h2>
+                <a href="/polls/{{ name.name }}/register">Sign up for a course</a>
+            </h2>    
+        </div>
+<!-- {% if list_of_people_registered %}
+    <ul>
+    {% for enrollment in list_of_people_registered %}
+        <li>{{ enrollment.person }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %} -->
+
+    </body>
+</html>

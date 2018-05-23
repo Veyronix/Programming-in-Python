@@ -1,0 +1,7 @@
+{% extends 'polls/course_detail.html' %}
+
+{% block content %}
+    {% for name1 in name %}
+        <h1>{{name1.name}}</h1>
+    {% endfor %}
+{% endblock %}

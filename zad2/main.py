@@ -25,9 +25,6 @@ def draw(json_parser, if_print):
 
 
 def main():
-    pass
-    print('Number of arguments:', len(argv), 'arguments.')
-    print('Argument List:', str(argv[1]))
     if_to_print = 0
 
     if not exists(str(argv[1])):
@@ -42,13 +39,12 @@ def main():
     all_lines = ""
     for i in file:
         all_lines += i
-    print(all_lines)
     try:
         json_my = JSONParser(loads(all_lines))
 
     except ValueError:
         print("Bad JSON", exc_info())
-        exit(1)
+        return 1
 
     draw(json_my, if_to_print)
 

@@ -1,0 +1,29 @@
+
+<html>
+        <head>
+                <title>Courses</title>
+        </head>
+        <body>
+            <div class="list-of-courses">
+                <h1>Courses</h1>
+                <a href="{% url 'new_course' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
+        
+         </div>
+        {% if all_courses %}
+            <ul>
+            {% for course in all_courses %}
+                <li><a href="/polls/{{ course.id }}/name">{{ course.name }}</a></li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No polls are available.</p>
+        {% endif %}
+        
+        <div class="add-course">
+            <a href="/polls/new_course">Add course</a>
+        </div>
+
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>
