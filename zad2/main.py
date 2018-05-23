@@ -26,7 +26,6 @@ def draw(json_parser, if_print):
 
 def main():
     if_to_print = 0
-
     if not exists(str(argv[1])):
         print("Given file doesnt exist.")
         return 1

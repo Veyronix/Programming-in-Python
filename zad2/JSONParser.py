@@ -91,11 +91,17 @@ class JSONParser:
             for j in i:
                 if j not in ["color", "points", "type"]:
                     if not isinstance(i[j], numbers.Integral):
-                        print("Argument", j, "isnt number")
+                        print("Argument", j, "isn't number")
                         return 1
+                elif j in ["color", "type"]:
+                    if not isinstance(i[j], str):
+                        print("Argument", j, "isn't string")
+                        return 1
+
         i = json["Screen"]
         if not ("width" in i and isinstance(i["width"],
-                                            numbers.Integral) and "height" in i and "bg_color" in i and "fg_color" in i):
+                                            numbers.Integral) and "height" in i and isinstance(i["height"],
+                                                                                               numbers.Integral) and "bg_color" in i and "fg_color" in i):
             print("Bad Screen")
             return 1
 
@@ -103,8 +109,8 @@ class JSONParser:
     def return_color(palette, color):
         if color in palette:
             return palette[color]
-        if not isinstance(color, str):
-            print("Kind format of color")
+        if not (isinstance(color, str) and len(color) > 0 and (color[0] == "#" or color[0] == "(")):
+            print("Bad kind format of color")
             return 1
         elif re.match('^\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$', color):
             m = re.findall('(\d{1,3})', color)

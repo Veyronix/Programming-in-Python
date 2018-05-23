@@ -3,7 +3,7 @@
         {"type": "point", "x": 700, "y": 700 },
         {"type": "polygon", "points": [[20,50], [30,140], [50,180]], "color": "blue"},
         {"type": "rectangle", "x": 100, "y": 50, "width": 200, "height": 50, "color": "blue"},
-        {"type": "square", "x": 150, "y": 100, "size": 80, "color": "(0,255,255)"},
+        {"type": "square", "x": 150, "y": 100, "size": 80, "color": "#ffff00"},
         {"type": "circle", "x": 800, "y": 600, "radius": 100 }
     ],
     "Screen": {"width": 1000, "height": 1000, "bg_color": "black", "fg_color": "red"},
