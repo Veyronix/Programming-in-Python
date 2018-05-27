@@ -13,6 +13,10 @@ urlpatterns = [
     
     path('<str:name>/add_course',views.add_course,name = 'add_course'),
 
-    path('new_course',views.new_course,name = 'new_course')
+    path('new_course',views.new_course,name = 'new_course'),
+
+    path('<str:name>/new_enrollment',views.new_enrollment,name = 'new_enrollment')
+
+    # path('signed_up',views.new_enrollment,name = 'new_enrollment')
 
 ]
