@@ -6,8 +6,10 @@
     <body>
             <div class="name-of-course">
                     <h1>{{name.name}}</h1>
+                    <h2>Date of event is {{date}}</h2>
             </div>
         {% if list_of_people_registered %}
+        <h3>Participants:</h3>
             {% for enrollment in list_of_people_registered %}
                 <div class="content container">
                     <div class = "row">
@@ -18,28 +20,20 @@
                 </div>
             {% endfor %}    
         {% else %}
-            <p>Brak zapisanych.</p>
+            <p>No participants.</p>
         {% endif %}
-        {% if amount_of_vacancies != 0 %}
+        {% if amount_of_vacancies > 0 %}
             <div class="places">
                 <h2>Amount of vacancies</h2>
                 {{ amount_of_vacancies }}
             </div>
+            <div class="register">
+                <h2>
+                    <a href="/polls/{{ name.name }}/new_enrollment">Sign up for a course</a>
+                </h2>    
+            </div>
         {% endif %}
-        <div class="register">
-            <h2>
-                <a href="/polls/{{ name.name }}/new_enrollment">Sign up for a course</a>
-            </h2>    
-        </div>
-<!-- {% if list_of_people_registered %}
-    <ul>
-    {% for enrollment in list_of_people_registered %}
-        <li>{{ enrollment.person }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No polls are available.</p>
-{% endif %} -->
+            
 
     </body>
 </html>
