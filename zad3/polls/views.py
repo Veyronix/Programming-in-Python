@@ -42,17 +42,25 @@ def new_course(request):
         if form.is_valid():
             # d=datetime.datetime.strptime(request.POST['date'], "%Y-%m-%d %H:%M")
             # dnow=datetime.datetime.now()
-            if datetime.datetime.now() > datetime.datetime.strptime(request.POST['date'], "%Y-%m-%d %H:%M"):
-                context = "Too late"
-            elif int(request.POST['amount_of_places']) <= 0:
-                context = "Bad amount of places."
-            elif Courses.objects.filter(name=request.POST['name']).exists(): 
-                context = "Course already exists"
-            # elif dnow > d
-            #     context = "Too late"
-            else:
-                Courses.objects.create(name = request.POST['name'],amount_of_places = request.POST['amount_of_places'],date = request.POST['date'])
-                context = "Created course"
+            try:
+                # d = datetime.datetime.strptime(request.POST['date'], "%Y-%m-%d %H:%M")
+            
+                if datetime.datetime.now() > datetime.datetime.strptime(request.POST['date'], "%Y-%m-%d %H:%M"):
+                    context = "Too late"
+                    
+                elif int(request.POST['amount_of_places']) <= 0:
+                    context = "Bad amount of places."
+                elif Courses.objects.filter(name=request.POST['name']).exists(): 
+                    context = "Course already exists"
+                # elif dnow > d
+                #     context = "Too late"
+                else:
+                    Courses.objects.create(name = request.POST['name'],amount_of_places = request.POST['amount_of_places'],date = request.POST['date'])
+                    context = "Created course"
+
+            except ValueError:
+                context = "Give time of event."
+
             return render(request,'polls/signed_up.html',{'context': context})
     else:
         form = NewCourse()
